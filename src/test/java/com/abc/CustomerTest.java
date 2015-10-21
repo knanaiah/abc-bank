@@ -7,12 +7,13 @@ import static org.junit.Assert.assertEquals;
 
 public class CustomerTest {
 
+    private static final double DOUBLE_DELTA = 1e-15;
+    //Objects belong to class so they can be used by all test methods
+    private Account checkingAccount = new Account(Account.CHECKING);
+    private Account savingsAccount = new Account(Account.SAVINGS);
+
     @Test //Test customer statement generation
     public void testApp(){
-
-        Account checkingAccount = new Account(Account.CHECKING);
-        Account savingsAccount = new Account(Account.SAVINGS);
-
         Customer henry = new Customer("Henry").openAccount(checkingAccount).openAccount(savingsAccount);
 
         checkingAccount.deposit(100.0);
@@ -53,5 +54,34 @@ public class CustomerTest {
                 .openAccount(new Account(Account.SAVINGS));
         oscar.openAccount(new Account(Account.CHECKING));
         assertEquals(3, oscar.getNumberOfAccounts());
+    }
+
+    //Added this test to ensure interest is calculated accurately in Checking.
+    @Test
+    public void testCheckingInterestEarned() {
+        //This should ensure a checking balance of $100.00 and savings balance of $3800.00
+        testApp();
+        assertEquals(0.1, checkingAccount.interestEarned(), DOUBLE_DELTA);
+    }
+
+    //Added this test to ensure interest is calculated accurately in Savings.
+    @Test
+    public void testSavingsInterestEarned() {
+        //This should ensure a checking balance of $100.00 and savings balance of $3800.00
+        testApp();
+        assertEquals(6.6, savingsAccount.interestEarned(), DOUBLE_DELTA);
+    }
+
+    //Added this test to ensure transactions are calculated accurately.
+    @Test
+    public void testSumTransactions() {
+        //This should ensure a checking balance of $100.00 and savings balance of $3800.00
+        checkingAccount.deposit(100.0);
+        checkingAccount.deposit(250.0);
+        checkingAccount.withdraw(100.0);
+        savingsAccount.deposit(3000.0);
+        savingsAccount.withdraw(500.0);
+        assertEquals(250.00, checkingAccount.sumTransactions(), DOUBLE_DELTA);
+        assertEquals(2500.00, savingsAccount.sumTransactions(), DOUBLE_DELTA);
     }
 }

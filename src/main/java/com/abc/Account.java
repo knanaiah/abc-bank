@@ -25,43 +25,59 @@ public class Account {
         }
     }
 
-public void withdraw(double amount) {
-    if (amount <= 0) {
-        throw new IllegalArgumentException("amount must be greater than zero");
-    } else {
-        transactions.add(new Transaction(-amount));
-    }
-}
-
-    public double interestEarned() {
-        double amount = sumTransactions();
-        switch(accountType){
-            case SAVINGS:
-                if (amount <= 1000)
-                    return amount * 0.001;
-                else
-                    return 1 + (amount-1000) * 0.002;
-//            case SUPER_SAVINGS:
-//                if (amount <= 4000)
-//                    return 20;
-            case MAXI_SAVINGS:
-                if (amount <= 1000)
-                    return amount * 0.02;
-                if (amount <= 2000)
-                    return 20 + (amount-1000) * 0.05;
-                return 70 + (amount-2000) * 0.1;
-            default:
-                return amount * 0.001;
+    public void withdraw(double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("amount must be greater than zero");
+        } else {
+            transactions.add(new Transaction(-amount));
         }
     }
 
-    public double sumTransactions() {
-       return checkIfTransactionsExist(true);
+    //Replaced SWITCH statement with calls to Inner Class Methods
+    public double interestEarned() {
+        double amount = sumTransactions();
+        Account.EarnedInterest earnedInterest = new Account.EarnedInterest();
+        if (accountType == CHECKING) return earnedInterest.interestEarnedChecking(amount);
+        else if (accountType == SAVINGS) return earnedInterest.interestEarnedSavings(amount);
+        else return earnedInterest.interestEarnedMaxiSavings(amount);
     }
 
-    private double checkIfTransactionsExist(boolean checkAll) {
+    //Encapsulated account specific interest calculation within a nested class.
+    //Can also replace this with child classes for each account type - Polymorphism design
+    class EarnedInterest {
+        private double interestEarnedChecking(double amount) {
+            return amount * 0.001;
+        }
+
+        private double interestEarnedSavings(double amount) {
+            if (amount <= 1000)
+                return amount * 0.001;
+            else
+                return 1 + (amount - 1000) * 0.002;
+        }
+
+        //Interest is accrued every day of the year, including weekends and holidays.
+        private double interestEarnedMaxiSavings(double amount) {
+            int dayOfYear = DateProvider.getInstance().DayOfYear();
+            if (amount <= 1000)
+                return amount * 0.02 * (dayOfYear/365);
+            if (amount <= 2000)
+                return 20 + ((amount - 1000) * 0.05 * (dayOfYear/365));
+            return 70 + ((amount - 2000) * 0.1 * (dayOfYear/365));
+        }
+   }
+
+    //Removed the boolean. Unnecessary if it is always true.
+    public double sumTransactions() {
+       return checkIfTransactionsExist();
+    }
+
+    //Removed boolean argument since all transactions are being checked.
+    //Need to overload this method if specific transactions are to be checked
+    //or modify code within the method.
+    private double checkIfTransactionsExist() {
         double amount = 0.0;
-        for (Transaction t: transactions)
+        for (Transaction t : transactions)
             amount += t.amount;
         return amount;
     }

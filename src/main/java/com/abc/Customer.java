@@ -28,15 +28,15 @@ public class Customer {
     }
 
     public double totalInterestEarned() {
-        double total = 0;
+        //primitive data types need to initialize to correct format.
+        double total = 0.0;
         for (Account a : accounts)
             total += a.interestEarned();
         return total;
     }
 
     public String getStatement() {
-        String statement = null;
-        statement = "Statement for " + name + "\n";
+        String statement = "Statement for " + name + "\n";
         double total = 0.0;
         for (Account a : accounts) {
             statement += "\n" + statementForAccount(a) + "\n";
@@ -72,7 +72,6 @@ public class Customer {
         return s;
     }
 
-    private String toDollars(double d){
-        return String.format("$%,.2f", abs(d));
+    private String toDollars(double d){ return String.format("$%,.2f", abs(d));
     }
 }
