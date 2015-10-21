@@ -1,5 +1,6 @@
 package com.abc;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,8 @@ public class Account {
 
     private final int accountType;
     public List<Transaction> transactions;
+
+    private int dayOfYear = DateProvider.getInstance().DayOfYear();
 
     public Account(int accountType) {
         this.accountType = accountType;
@@ -45,25 +48,42 @@ public class Account {
     //Encapsulated account specific interest calculation within a nested class.
     //Can also replace this with child classes for each account type - Polymorphism design
     class EarnedInterest {
+        BigDecimal bd;
+
+        //Interest is accrued every day of the year, including weekends and holidays.
         private double interestEarnedChecking(double amount) {
-            return amount * 0.001;
+            bd = new BigDecimal((amount * 0.001 * dayOfYear) / 365);
+            return bd.setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
         }
 
+        //Interest is accrued every day of the year, including weekends and holidays.
         private double interestEarnedSavings(double amount) {
-            if (amount <= 1000)
-                return amount * 0.001;
-            else
-                return 1 + (amount - 1000) * 0.002;
+            if (amount <= 1000) {
+                bd = new BigDecimal((amount * 0.001 * dayOfYear) / 365);
+                return bd.setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
+            }
+            else {
+                bd = new BigDecimal(((1000 * 0.001 * dayOfYear) / 365) + ((amount - 1000) * 0.002 * dayOfYear) / 365);
+                return bd.setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
+            }
         }
 
         //Interest is accrued every day of the year, including weekends and holidays.
         private double interestEarnedMaxiSavings(double amount) {
-            int dayOfYear = DateProvider.getInstance().DayOfYear();
-            if (amount <= 1000)
-                return amount * 0.02 * (dayOfYear/365);
-            if (amount <= 2000)
-                return 20 + ((amount - 1000) * 0.05 * (dayOfYear/365));
-            return 70 + ((amount - 2000) * 0.1 * (dayOfYear/365));
+            double interest;
+            if (amount <= 1000) {
+                bd = new BigDecimal((amount * 0.02 * dayOfYear) / 365);
+                interest = bd.setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
+            }
+            else if (amount <= 2000) {
+                bd = new BigDecimal((1000 * 0.02 * dayOfYear) / 365 + ((amount - 1000) * 0.05 * dayOfYear) / 365);
+                interest = bd.setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
+            }
+            else {
+                bd = new BigDecimal((1000 * 0.02 * dayOfYear) / 365 + (1000 * 0.05 * dayOfYear) / 365 + ((amount - 2000) * 0.1 * dayOfYear) / 365);
+                interest = bd.setScale(2, BigDecimal.ROUND_DOWN).doubleValue();
+            }
+            return interest;
         }
    }
 

@@ -8,9 +8,11 @@ import static org.junit.Assert.assertEquals;
 public class CustomerTest {
 
     private static final double DOUBLE_DELTA = 1e-15;
+
     //Objects belong to class so they can be used by all test methods
     private Account checkingAccount = new Account(Account.CHECKING);
     private Account savingsAccount = new Account(Account.SAVINGS);
+    private Account maxiSavingsAccount = new Account(Account.MAXI_SAVINGS);
 
     @Test //Test customer statement generation
     public void testApp(){
@@ -59,17 +61,24 @@ public class CustomerTest {
     //Added this test to ensure interest is calculated accurately in Checking.
     @Test
     public void testCheckingInterestEarned() {
-        //This should ensure a checking balance of $100.00 and savings balance of $3800.00
-        testApp();
-        assertEquals(0.1, checkingAccount.interestEarned(), DOUBLE_DELTA);
+        checkingAccount.deposit(100);
+        assertEquals(0.08, checkingAccount.interestEarned(), DOUBLE_DELTA);
     }
 
     //Added this test to ensure interest is calculated accurately in Savings.
     @Test
     public void testSavingsInterestEarned() {
+        savingsAccount.deposit(2000);
+        assertEquals(2.41, savingsAccount.interestEarned(), DOUBLE_DELTA);
+    }
+
+    //Added this test to ensure interest is calculated accurately in Maxi Savings.
+    @Test
+    public void testMaxiSavingsInterestEarned() {
         //This should ensure a checking balance of $100.00 and savings balance of $3800.00
-        testApp();
-        assertEquals(6.6, savingsAccount.interestEarned(), DOUBLE_DELTA);
+        maxiSavingsAccount.deposit(5000);
+        maxiSavingsAccount.withdraw(1000);
+        assertEquals(217.47, maxiSavingsAccount.interestEarned(), DOUBLE_DELTA);
     }
 
     //Added this test to ensure transactions are calculated accurately.

@@ -21,5 +21,5 @@ public class DateProvider {
         return Calendar.getInstance().getTime();
     }
 
-    public int DayOfYear() { return Calendar.DAY_OF_YEAR; }
+    public int DayOfYear() { return Calendar.getInstance().get(Calendar.DAY_OF_YEAR); }
 }
